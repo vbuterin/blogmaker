@@ -30,4 +30,4 @@ For the server, the simplest setup is to use any VPS, `apt install apache2`, mak
 
 ### Misc
 
-Credit to hackmd for styles.
+Credit to https://hackmd.io for CSS styles.
