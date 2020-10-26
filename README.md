@@ -27,3 +27,7 @@ Other options include:
 * `./publish.py --sync all` to sync everything (including scripts and styles). **Make sure to run this the first time you publish**
 
 For the server, the simplest setup is to use any VPS, `apt install apache2`, make sure apache2 is running, and just set the directory to /var/www/html.
+
+### Misc
+
+Credit to hackmd for styles.
