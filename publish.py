@@ -37,6 +37,8 @@ HEADER = """
 
 """
 
+TITLE_TEMPLATE = """ <title> {} </title> """
+
 FOOTER = """ </div> """
 
 TOC_HEADER = """
@@ -148,6 +150,7 @@ if __name__ == '__main__':
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
         total_file_contents = (
             HEADER +
+            TITLE_TEMPLATE.format(metadata['title']) +
             make_twitter_card(metadata, global_config) +
             defancify(open('/tmp/temp_output.html').read()) +
             FOOTER
@@ -166,7 +169,8 @@ if __name__ == '__main__':
     toc_items = [make_toc_item(metadata) for metadata in sorted_metadatas]
 
     toc = (
-        HEADER +
+        HEADER +    
+        TITLE_TEMPLATE.format(global_config['title']) +
         make_twitter_card(global_config, global_config) +
         TOC_HEADER.format(global_config['title']) +
         ''.join(toc_items) +
