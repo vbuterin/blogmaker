@@ -45,7 +45,7 @@ TOC_HEADER = """
 <h1>{}</h1>
 <br>
 <br>
-<ul class="post-list">
+<ul class="post-list" style="padding-left:0">
 
 """
 
@@ -112,15 +112,18 @@ if __name__ == '__main__':
     global_config = extract_metadata(open('config.md'))
 
     # Special case: '--sync' option
-    if sys.argv[1] == '--sync':
-        if 'posts' in sys.argv[2:] or 'all' in sys.argv[2:]:
+    if len(sys.argv) >= 2 and sys.argv[1] == '--sync':
+        flags = set(sys.argv[2:])
+        if flags.intersection({'posts', 'all'}):
             os.system('rsync -av site/. {}:{}'.format(global_config['server'], global_config['website_root']))
-        if 'images' in sys.argv[2:] or 'all' in sys.argv[2:]:
+        elif flags.intersection({'images', 'all'}):
             os.system('rsync -av images {}:{}'.format(global_config['server'], global_config['website_root']))
-        if 'scripts' in sys.argv[2:] or 'all' in sys.argv[2:]:
+        elif flags.intersection({'scripts', 'all'}):
             os.system('rsync -av scripts {}:{}'.format(global_config['server'], global_config['website_root']))
-        if 'styles' in sys.argv[2:] or 'all' in sys.argv[2:]:
+        elif flags.intersection({'css', 'styles', 'all'}):
             os.system('rsync -av css {}:{}'.format(global_config['server'], global_config['website_root']))
+        else:
+            raise Exception("--sync missing flags")
         sys.exit()
 
     # Normal case: process each provided file
