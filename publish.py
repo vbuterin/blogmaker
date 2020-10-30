@@ -37,21 +37,17 @@ HEADER = """
 
 """
 
-TITLE_TEMPLATE = """ <title> {} </title> """
+TITLE_TEMPLATE = """ <br> <h1> {0} </h1> <br> <br> <title> {0} </title> """
 
 FOOTER = """ </div> """
 
-TOC_HEADER = """
+TOC_START = """
 
-<br>
-<h1>{}</h1>
-<br>
-<br>
 <ul class="post-list" style="padding-left:0">
 
 """
 
-TOC_FOOTER = """ </ul> """
+TOC_END = """ </ul> """
 
 TOC_ITEM_TEMPLATE = """
 
@@ -150,8 +146,8 @@ if __name__ == '__main__':
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
         total_file_contents = (
             HEADER +
-            TITLE_TEMPLATE.format(metadata['title']) +
             make_twitter_card(metadata, global_config) +
+            TITLE_TEMPLATE.format(metadata['title']) +
             defancify(open('/tmp/temp_output.html').read()) +
             FOOTER
         )
@@ -170,11 +166,11 @@ if __name__ == '__main__':
 
     toc = (
         HEADER +    
-        TITLE_TEMPLATE.format(global_config['title']) +
         make_twitter_card(global_config, global_config) +
-        TOC_HEADER.format(global_config['title']) +
+        TITLE_TEMPLATE.format(global_config['title']) +
+        TOC_START +
         ''.join(toc_items) +
-        TOC_FOOTER
+        TOC_END
     )
 
     open('site/index.html', 'w').write(toc)
