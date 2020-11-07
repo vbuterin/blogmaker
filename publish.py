@@ -39,6 +39,14 @@ HEADER = """
 
 TITLE_TEMPLATE = """ <br> <h1> {0} </h1> <br> <br> <title> {0} </title> """
 
+TOC_TITLE_TEMPLATE = """
+
+<title> {0} </title>
+<br>
+<center><h1 style="border-bottom:0px"> {0} </h1></center>
+
+"""
+
 FOOTER = """ </div> """
 
 TOC_START = """
@@ -75,20 +83,30 @@ def extract_metadata(fil, filename=None):
         line = fil.readline()
         if line and line[0] == '[' and ']' in line:
             key = line[1:line.find(']')]
-            value_start = line.index('(')+1
-            value_end = line.index(')')
-            metadata[key] = line[value_start:value_end]
+            value_start = line.find('(')+1
+            value_end = line.rfind(')')
+            if key in ('category', 'categories'):
+                metadata['categories'] = set([
+                    x.strip().lower() for x in line[value_start:value_end].split(',')
+                ])
+                assert '' not in metadata['categories']
+            else:
+                metadata[key] = line[value_start:value_end]
         else:
             break
     return metadata
 
 
-def metadata_to_path(metadata):
-    return os.path.join(metadata['category'].lower(), metadata['date'], metadata['filename'])
+def metadata_to_path(global_config, metadata):
+    return os.path.join(
+        global_config.get('posts_directory', 'posts'),
+        metadata['date'],
+        metadata['filename']
+    )
 
 
-def make_twitter_card(metadata, global_config):
-    return TWITTER_CARD_TEMPLATE.format(metadata['title'], global_config['icon'])
+def make_twitter_card(title, global_config):
+    return TWITTER_CARD_TEMPLATE.format(title, global_config['icon'])
 
 
 def defancify(text):
@@ -99,11 +117,38 @@ def defancify(text):
         .replace('…', '...') \
 
 
-def make_toc_item(metadata):
+def make_categories_header(categories):
+    o = ['<center><hr>']
+    for category in categories:
+        template = '<span class="toc-category" style="font-size:{}%"><a href="/categories/{}.html">{}</a></span>'
+        o.append(template.format(min(100, 1000 // len(category)), category, category.capitalize()))
+    o.append('<hr></center>')
+    return '\n'.join(o)
+
+
+def make_toc_item(global_config, metadata):
     year, month, day = metadata['date'].split('/')
     month = 'JanFebMarAprMayJunJulAugSepOctNovDec'[int(month)*3-3:][:3]
-    link = os.path.join('/', metadata_to_path(metadata))
+    link = '/' + metadata_to_path(global_config, metadata)
     return TOC_ITEM_TEMPLATE.format(year+' '+month+' '+day, link, metadata['title'])
+
+
+def make_toc(toc_items, global_config, all_categories, category=None):
+    if category:
+        title = category.capitalize()
+    else:
+        title = global_config['title']
+
+    return (
+        HEADER +    
+        make_twitter_card(title, global_config) +
+        TOC_TITLE_TEMPLATE.format(title) +
+        make_categories_header(all_categories) +
+        TOC_START +
+        ''.join(toc_items) +
+        TOC_END
+    )
+
 
 if __name__ == '__main__':
     # Get blog config
@@ -132,45 +177,53 @@ if __name__ == '__main__':
         # Extract path
         file_data = open(file_location).read()
         metadata = extract_metadata(open(file_location), filename)
-        path = metadata_to_path(metadata)
+        path = metadata_to_path(global_config, metadata)
+
+        # Generate the html file
+        options = metadata.get('pandoc', '')
+        
+        os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
+        total_file_contents = (
+            HEADER +
+            make_twitter_card(metadata['title'], global_config) +
+            TITLE_TEMPLATE.format(metadata['title']) +
+            defancify(open('/tmp/temp_output.html').read()) +
+            FOOTER
+        )
+
         print("Path selected: {}".format(path))
         
         # Make sure target directory exists
         truncated_path = os.path.split(path)[0]
         os.system('mkdir -p {}'.format(os.path.join('site', truncated_path)))
         
-        # Generate the html file
-        out_location = os.path.join('site', path)
-        options = metadata.get('pandoc', '')
-        
-        os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
-        total_file_contents = (
-            HEADER +
-            make_twitter_card(metadata, global_config) +
-            TITLE_TEMPLATE.format(metadata['title']) +
-            defancify(open('/tmp/temp_output.html').read()) +
-            FOOTER
-        )
-    
         # Put it in the desired location
+        out_location = os.path.join('site', path)
         open(out_location, 'w').write(total_file_contents)
 
     # Reset ToC
     metadatas = []
+    categories = set()
     for filename in os.listdir('posts'):
         if filename[-4:-1] != '.sw':
             metadatas.append(extract_metadata(open(os.path.join('posts', filename)), filename))
+            categories = categories.union(metadatas[-1]['categories'])
+            
+    print("Detected categories: {}".format(' '.join(categories)))
 
     sorted_metadatas = sorted(metadatas, key=lambda x: x['date'], reverse=True)
-    toc_items = [make_toc_item(metadata) for metadata in sorted_metadatas]
+    toc_items = [make_toc_item(global_config, metadata) for metadata in sorted_metadatas]
 
-    toc = (
-        HEADER +    
-        make_twitter_card(global_config, global_config) +
-        TITLE_TEMPLATE.format(global_config['title']) +
-        TOC_START +
-        ''.join(toc_items) +
-        TOC_END
-    )
+    os.system('mkdir -p {}'.format(os.path.join('site', 'categories')))
 
-    open('site/index.html', 'w').write(toc)
+    print("Building tables of contents...")
+
+    for category in categories:
+        category_toc_items = [
+            toc_items[i] for i in range(len(toc_items)) if
+            category in sorted_metadatas[i]['categories']
+        ]
+        toc = make_toc(category_toc_items, global_config, categories, category)
+        open(os.path.join('site', 'categories', category+'.html'), 'w').write(toc)
+
+    open('site/index.html', 'w').write(make_toc(toc_items, global_config, categories))
