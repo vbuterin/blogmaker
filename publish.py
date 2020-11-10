@@ -51,6 +51,7 @@ FOOTER = """ </div> """
 
 TOC_START = """
 
+<br>
 <ul class="post-list" style="padding-left:0">
 
 """
