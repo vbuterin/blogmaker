@@ -37,7 +37,16 @@ HEADER = """
 
 """
 
-TITLE_TEMPLATE = """ <br> <h1> {0} </h1> <br> <br> <title> {0} </title> """
+TITLE_TEMPLATE = """
+
+<br>
+<h1 style="margin-bottom:7px"> {0} </h1>
+<small style="float:left; color: #888"> {1} </small>
+<small style="float:right; color: #888"><a href="/">See all posts</a></small>
+<br> <br> <br>
+<title> {0} </title>
+
+"""
 
 TOC_TITLE_TEMPLATE = """
 
@@ -127,11 +136,14 @@ def make_categories_header(categories):
     return '\n'.join(o)
 
 
-def make_toc_item(global_config, metadata):
+def get_printed_date(metadata):
     year, month, day = metadata['date'].split('/')
     month = 'JanFebMarAprMayJunJulAugSepOctNovDec'[int(month)*3-3:][:3]
+    return year + ' ' + month + ' ' + day
+
+def make_toc_item(global_config, metadata):
     link = '/' + metadata_to_path(global_config, metadata)
-    return TOC_ITEM_TEMPLATE.format(year+' '+month+' '+day, link, metadata['title'])
+    return TOC_ITEM_TEMPLATE.format(get_printed_date(metadata), link, metadata['title'])
 
 
 def make_toc(toc_items, global_config, all_categories, category=None):
@@ -187,7 +199,7 @@ if __name__ == '__main__':
         total_file_contents = (
             HEADER +
             make_twitter_card(metadata['title'], global_config) +
-            TITLE_TEMPLATE.format(metadata['title']) +
+            TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata)) +
             defancify(open('/tmp/temp_output.html').read()) +
             FOOTER
         )
