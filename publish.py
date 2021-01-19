@@ -238,5 +238,7 @@ if __name__ == '__main__':
         ]
         toc = make_toc(category_toc_items, global_config, categories, category)
         open(os.path.join('site', 'categories', category+'.html'), 'w').write(toc)
+        if category == global_config.get('homepage_category', ''):
+            toc_items = category_toc_items
 
     open('site/index.html', 'w').write(make_toc(toc_items, global_config, categories))
