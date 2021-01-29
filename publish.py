@@ -231,6 +231,8 @@ if __name__ == '__main__':
 
     print("Building tables of contents...")
 
+    homepage_toc_items = toc_items
+
     for category in categories:
         category_toc_items = [
             toc_items[i] for i in range(len(toc_items)) if
@@ -239,6 +241,6 @@ if __name__ == '__main__':
         toc = make_toc(category_toc_items, global_config, categories, category)
         open(os.path.join('site', 'categories', category+'.html'), 'w').write(toc)
         if category == global_config.get('homepage_category', ''):
-            toc_items = category_toc_items
+            homepage_toc_items = category_toc_items
 
     open('site/index.html', 'w').write(make_toc(toc_items, global_config, categories))
