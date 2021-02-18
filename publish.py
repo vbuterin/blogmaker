@@ -243,4 +243,4 @@ if __name__ == '__main__':
         if category == global_config.get('homepage_category', ''):
             homepage_toc_items = category_toc_items
 
-    open('site/index.html', 'w').write(make_toc(toc_items, global_config, categories))
+    open('site/index.html', 'w').write(make_toc(homepage_toc_items, global_config, categories))
