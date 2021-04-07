@@ -1,9 +1,13 @@
 #!/usr/bin/python3
-import os, sys
+import os, sys, datetime
 
-HEADER = """
+PRE_HEADER = """
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+"""
+
+HEADER = """
 
 <link rel="stylesheet" type="text/css" href="/css/common-vendor.b8ecfc406ac0b5f77a26.css">
 <link rel="stylesheet" type="text/css" href="/css/font-vendor.b86e2bf451b246b1a88e.css">
@@ -34,6 +38,12 @@ HEADER = """
 </style>
 
 <div id="doc" class="container-fluid markdown-body comment-enabled" data-hard-breaks="true">
+
+"""
+
+RSS_LINK = """
+
+<link rel="alternate" type="application/rss+xml" href="/feed.xml" title="{}">
 
 """
 
@@ -71,7 +81,7 @@ TOC_ITEM_TEMPLATE = """
 
 <li>
     <span class="post-meta">{}</span>
-    <h3>
+    <h3 style="margin-top:12px">
       <a class="post-link" href="{}">{}</a>
     </h3>
 </li>
@@ -82,6 +92,35 @@ TWITTER_CARD_TEMPLATE = """
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="{}" />
 <meta name="twitter:image" content="{}" />
+"""
+
+
+RSS_ITEM_TEMPLATE = """
+<item>
+<title>{title}</title>
+<link>{link}</link>
+<guid>{link}</guid>
+<pubDate>{pub_date}</pubDate>
+<description>{description}</description>
+</item>
+"""
+
+
+RSS_MAIN_TEMPLATE = """
+<?xml version="1.0" ?>
+<rss version="2.0">
+<channel>
+  <title>{title}</title>
+  <link>{link}</link>
+  <description>{title}</description>
+  <image>
+      <url>{icon}</url>
+      <title>{title}</title>
+      <link>{link}</link>
+  </image>
+{items}
+</channel>
+</rss>
 """
 
 def extract_metadata(fil, filename=None):
@@ -113,6 +152,32 @@ def metadata_to_path(global_config, metadata):
         metadata['date'],
         metadata['filename']
     )
+
+
+def generate_feed(global_config, metadatas):
+    def get_link(route):
+        return global_config['domain'] + "/" + route
+
+    def get_date(date_text):
+        year, month, day = (int(x) for x in date_text.split('/'))
+        date = datetime.date(year, month, day)
+        return date.strftime('%a, %d %b %Y 00:00:00 +0000')
+
+    def get_item(metadata):
+        return RSS_ITEM_TEMPLATE.format(
+            title=metadata['title'],
+            link=get_link('/'.join([global_config['posts_directory'], metadata['date'], metadata['filename']])),
+            pub_date=get_date(metadata['date']), description=''
+        )
+
+    return RSS_MAIN_TEMPLATE.strip().format(
+        title=global_config['title'],
+        link=get_link(''),
+        icon=global_config['icon'],
+        items="\n".join(map(get_item, metadatas))
+    )
+
+
 
 
 def make_twitter_card(title, global_config):
@@ -153,7 +218,9 @@ def make_toc(toc_items, global_config, all_categories, category=None):
         title = global_config['title']
 
     return (
-        HEADER +    
+        PRE_HEADER +
+        RSS_LINK.format(title) +
+        HEADER +
         make_twitter_card(title, global_config) +
         TOC_TITLE_TEMPLATE.format(title) +
         make_categories_header(all_categories) +
@@ -197,6 +264,8 @@ if __name__ == '__main__':
         
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
         total_file_contents = (
+            PRE_HEADER +
+            RSS_LINK.format(title) +
             HEADER +
             make_twitter_card(metadata['title'], global_config) +
             TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata)) +
@@ -226,6 +295,7 @@ if __name__ == '__main__':
 
     sorted_metadatas = sorted(metadatas, key=lambda x: x['date'], reverse=True)
     toc_items = [make_toc_item(global_config, metadata) for metadata in sorted_metadatas]
+    feed = generate_feed(global_config, sorted_metadatas)
 
     os.system('mkdir -p {}'.format(os.path.join('site', 'categories')))
 
@@ -243,4 +313,5 @@ if __name__ == '__main__':
         if category == global_config.get('homepage_category', ''):
             homepage_toc_items = category_toc_items
 
+    open('site/feed.xml', 'w').write(feed)
     open('site/index.html', 'w').write(make_toc(homepage_toc_items, global_config, categories))
