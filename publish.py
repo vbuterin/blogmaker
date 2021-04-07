@@ -265,7 +265,7 @@ if __name__ == '__main__':
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
         total_file_contents = (
             PRE_HEADER +
-            RSS_LINK.format(title) +
+            RSS_LINK.format(metadata['title']) +
             HEADER +
             make_twitter_card(metadata['title'], global_config) +
             TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata)) +
