@@ -3,7 +3,23 @@ import os, sys, datetime
 
 PRE_HEADER = """
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<style>
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1c1c1c;
+        color: white;
+    }
+    .markdown-body table tr {
+        background-color: #1c1c1c;
+    }
+    .markdown-body table tr:nth-child(2n) {
+        background-color: black;
+    }
+}
+</style>
 
 """
 
