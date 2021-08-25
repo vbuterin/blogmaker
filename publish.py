@@ -26,7 +26,6 @@ PRE_HEADER = """
 HEADER = """
 
 <link rel="stylesheet" type="text/css" href="/css/common-vendor.b8ecfc406ac0b5f77a26.css">
-<link rel="stylesheet" type="text/css" href="/css/font-vendor.b86e2bf451b246b1a88e.css">
 <link rel="stylesheet" type="text/css" href="/css/fretboard.f32f2a8d5293869f0195.css">
 <link rel="stylesheet" type="text/css" href="/css/pretty.0ae3265014f89d9850bf.css">
 <link rel="stylesheet" type="text/css" href="/css/pretty-vendor.83ac49e057c3eac4fce3.css">
