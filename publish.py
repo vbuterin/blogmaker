@@ -23,33 +23,30 @@ PRE_HEADER = """
 
 """
 
-HEADER = """
+HEADER_TEMPLATE = """
 
-<link rel="stylesheet" type="text/css" href="/css/common-vendor.b8ecfc406ac0b5f77a26.css">
-<link rel="stylesheet" type="text/css" href="/css/fretboard.f32f2a8d5293869f0195.css">
-<link rel="stylesheet" type="text/css" href="/css/pretty.0ae3265014f89d9850bf.css">
-<link rel="stylesheet" type="text/css" href="/css/pretty-vendor.83ac49e057c3eac4fce3.css">
-<link rel="stylesheet" type="text/css" href="/css/misc.css">
+<link rel="stylesheet" type="text/css" href="$root/css/common-vendor.b8ecfc406ac0b5f77a26.css">
+<link rel="stylesheet" type="text/css" href="$root/css/fretboard.f32f2a8d5293869f0195.css">
+<link rel="stylesheet" type="text/css" href="$root/css/pretty.0ae3265014f89d9850bf.css">
+<link rel="stylesheet" type="text/css" href="$root/css/pretty-vendor.83ac49e057c3eac4fce3.css">
+<link rel="stylesheet" type="text/css" href="$root/css/misc.css">
 
+<script type="text/x-mathjax-config">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  },
+  svg: {
+    fontCache: 'global',
+  }
+};
+</script>
 <script type="text/javascript" id="MathJax-script" async
-  src="/scripts/mathjax.js">
+  src="$root/scripts/tex-svg.js">
 </script>
 
 <style>
-@font-face {
-    font-family: MJXc-TeX-math-Iw;
-    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
-}
-@font-face {
-    font-family: MJXZERO;
-    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
-}
-@font-face {
-    font-family: MJXTEX;
-    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
-}
-
-.math { font-family: MJXc-TeX-math-Iw }
 </style>
 
 <div id="doc" class="container-fluid markdown-body comment-enabled" data-hard-breaks="true">
@@ -58,7 +55,7 @@ HEADER = """
 
 RSS_LINK = """
 
-<link rel="alternate" type="application/rss+xml" href="/feed.xml" title="{}">
+<link rel="alternate" type="application/rss+xml" href="{}/feed.xml" title="{}">
 
 """
 
@@ -67,7 +64,7 @@ TITLE_TEMPLATE = """
 <br>
 <h1 style="margin-bottom:7px"> {0} </h1>
 <small style="float:left; color: #888"> {1} </small>
-<small style="float:right; color: #888"><a href="/">See all posts</a></small>
+<small style="float:right; color: #888"><a href="{2}/index.html">See all posts</a></small>
 <br> <br> <br>
 <title> {0} </title>
 
@@ -207,11 +204,11 @@ def defancify(text):
         .replace('…', '...') \
 
 
-def make_categories_header(categories):
+def make_categories_header(categories, root_path):
     o = ['<center><hr>']
     for category in categories:
-        template = '<span class="toc-category" style="font-size:{}%"><a href="/categories/{}.html">{}</a></span>'
-        o.append(template.format(min(100, 1000 // len(category)), category, category.capitalize()))
+        template = '<span class="toc-category" style="font-size:{}%"><a href="{}/categories/{}.html">{}</a></span>'
+        o.append(template.format(min(100, 1000 // len(category)), root_path, category, category.capitalize()))
     o.append('<hr></center>')
     return '\n'.join(o)
 
@@ -221,24 +218,26 @@ def get_printed_date(metadata):
     month = 'JanFebMarAprMayJunJulAugSepOctNovDec'[int(month)*3-3:][:3]
     return year + ' ' + month + ' ' + day
 
-def make_toc_item(global_config, metadata):
-    link = '/' + metadata_to_path(global_config, metadata)
-    return TOC_ITEM_TEMPLATE.format(get_printed_date(metadata), link, metadata['title'])
+def make_toc_item(global_config, metadata, root_path):
+    link = metadata_to_path(global_config, metadata)
+    return TOC_ITEM_TEMPLATE.format(get_printed_date(metadata), root_path + '/' + link, metadata['title'])
 
 
 def make_toc(toc_items, global_config, all_categories, category=None):
     if category:
         title = category.capitalize()
+        root_path = '..'
     else:
         title = global_config['title']
+        root_path = '.'
 
     return (
         PRE_HEADER +
-        RSS_LINK.format(title) +
-        HEADER +
+        RSS_LINK.format(root_path, title) +
+        HEADER_TEMPLATE.replace('$root', root_path) +
         make_twitter_card(title, global_config) +
         TOC_TITLE_TEMPLATE.format(title) +
-        make_categories_header(all_categories) +
+        make_categories_header(all_categories, root_path) +
         TOC_START +
         ''.join(toc_items) +
         TOC_END
@@ -250,18 +249,8 @@ if __name__ == '__main__':
     global_config = extract_metadata(open('config.md'))
 
     # Special case: '--sync' option
-    if len(sys.argv) >= 2 and sys.argv[1] == '--sync':
-        flags = set(sys.argv[2:])
-        if flags.intersection({'posts', 'all'}):
-            os.system('rsync -av site/. {}:{}'.format(global_config['server'], global_config['website_root']))
-        elif flags.intersection({'images', 'all'}):
-            os.system('rsync -av images {}:{}'.format(global_config['server'], global_config['website_root']))
-        elif flags.intersection({'scripts', 'all'}):
-            os.system('rsync -av scripts {}:{}'.format(global_config['server'], global_config['website_root']))
-        elif flags.intersection({'css', 'styles', 'all'}):
-            os.system('rsync -av css {}:{}'.format(global_config['server'], global_config['website_root']))
-        else:
-            raise Exception("--sync missing flags")
+    if '--sync' in sys.argv:
+        os.system('rsync -av site/. {}:{}'.format(global_config['server'], global_config['website_root']))
         sys.exit()
 
     # Normal case: process each provided file
@@ -278,12 +267,13 @@ if __name__ == '__main__':
         options = metadata.get('pandoc', '')
         
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
+        root_path = '../../../..'
         total_file_contents = (
             PRE_HEADER +
-            RSS_LINK.format(metadata['title']) +
-            HEADER +
+            RSS_LINK.format(root_path, metadata['title']) +
+            HEADER_TEMPLATE.replace('$root', root_path) +
             make_twitter_card(metadata['title'], global_config) +
-            TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata)) +
+            TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata), root_path) +
             defancify(open('/tmp/temp_output.html').read()) +
             FOOTER
         )
@@ -309,24 +299,30 @@ if __name__ == '__main__':
     print("Detected categories: {}".format(' '.join(categories)))
 
     sorted_metadatas = sorted(metadatas, key=lambda x: x['date'], reverse=True)
-    toc_items = [make_toc_item(global_config, metadata) for metadata in sorted_metadatas]
     feed = generate_feed(global_config, sorted_metadatas)
 
     os.system('mkdir -p {}'.format(os.path.join('site', 'categories')))
 
     print("Building tables of contents...")
 
-    homepage_toc_items = toc_items
+    homepage_toc_items = [
+        make_toc_item(global_config, metadata, '.') for metadata in sorted_metadatas if
+        global_config.get('homepage_category', '') in metadata['categories'].union({''})
+    ]
 
     for category in categories:
         category_toc_items = [
-            toc_items[i] for i in range(len(toc_items)) if
-            category in sorted_metadatas[i]['categories']
+            make_toc_item(global_config, metadata, '..') for metadata in sorted_metadatas if
+            category in metadata['categories']
         ]
         toc = make_toc(category_toc_items, global_config, categories, category)
         open(os.path.join('site', 'categories', category+'.html'), 'w').write(toc)
-        if category == global_config.get('homepage_category', ''):
-            homepage_toc_items = category_toc_items
 
     open('site/feed.xml', 'w').write(feed)
     open('site/index.html', 'w').write(make_toc(homepage_toc_items, global_config, categories))
+
+    # Copy CSS and scripts files
+    this_file_directory = os.path.dirname(__file__)
+    os.system('cp -r {} site/'.format(os.path.join(this_file_directory, 'css')))
+    os.system('cp -r {} site/'.format(os.path.join(this_file_directory, 'scripts')))
+    os.system('rsync -av images site/')

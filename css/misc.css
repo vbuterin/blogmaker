@@ -49,3 +49,18 @@
 
 .python .cf {
   color: #a71d5d }
+
+@font-face {
+    font-family: MJXc-TeX-math-Iw;
+    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
+}
+@font-face {
+    font-family: MJXZERO;
+    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
+}
+@font-face {
+    font-family: MJXTEX;
+    src: url("https://assets.hackmd.io/build/MathJax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff")
+}
+
+.math { font-family: MJXc-TeX-math-Iw }
