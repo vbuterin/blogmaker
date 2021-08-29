@@ -19,12 +19,7 @@ If you need a post to use MathJaX to format LaTeX equations, add the line
 
 to the config at the top of the post.
 
-To compile a post to html, run `./publish.py posts/name_of_post.md` (or `./publish.py posts/*` to recompile everything). Use `./publish.py --sync posts` to upload the latest version of your site to your server (make sure to put your server details, as well as the site title and icon, in [config.md](./config.md)).
-
-Other options include:
-
-* `./publish.py --sync images` to sync the images directory
-* `./publish.py --sync all` to sync everything (including scripts and styles). **Make sure to run this the first time you publish**
+To compile a post to html, run `./publish.py posts/name_of_post.md` (or `./publish.py posts/*` to recompile everything). Use `./publish.py --sync` to upload the latest version of your site to your server (make sure to put your server details, as well as the site title and icon, in [config.md](./config.md)).
 
 For the server, the simplest setup is to use any VPS, `apt install apache2`, make sure apache2 is running, and just set the directory to /var/www/html.
 
