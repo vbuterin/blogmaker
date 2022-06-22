@@ -208,7 +208,7 @@ def make_categories_header(categories, root_path):
     o = ['<center><hr>']
     for category in categories:
         template = '<span class="toc-category" style="font-size:{}%"><a href="{}/categories/{}.html">{}</a></span>'
-        o.append(template.format(min(100, 1000 // len(category)), root_path, category, category.capitalize()))
+        o.append(template.format(min(100, 850 // len(category)), root_path, category, category.capitalize()))
     o.append('<hr></center>')
     return '\n'.join(o)
 
