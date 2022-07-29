@@ -54,6 +54,13 @@ html, body {
 	background-color: var(--color-divider);
 }
 
+#doc img {
+	padding: 12px;
+	background-color: #fff;
+	border: 1px solid var(--color-divider);
+	border-radius: 3px;
+}
+
 /*
 	Tables
 */
