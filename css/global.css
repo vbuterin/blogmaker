@@ -5,7 +5,7 @@
 	--color-text: #333;
 	--color-bg: #fafafa;
 	--color-heading: #333;
-	--color-divider: #e2e2e2;
+	--color-divider: #cdcdcd;
 	--color-anchor: #337ab7;
 	--color-toggle-accent: #c3a554;
 	--color-table-row-header: #e8e6e6;
@@ -55,11 +55,8 @@ html, body {
 	background-color: var(--color-divider);
 }
 
-#doc img {
-	padding: 12px;
-	background-color: #fff;
-	border: 1px solid var(--color-divider);
-	border-radius: 3px;
+#doc blockquote {
+	border-left: var(--color-divider);
 }
 
 /*
@@ -82,9 +79,20 @@ html, body {
 }
 
 /*
-	Dark Mode Images
+	Images
+	- Optional: add 'padded' class to give extra padding to an image
 	- Optional: add 'invert' class to the image for dark mode inversion
 */
+#doc img {
+	border: 1px solid var(--color-divider);
+	border-radius: 3px;
+}
+
+#doc img.padded {
+	padding: 12px;
+	background-color: #fff;
+}
+
 html.dark #doc img.invert {
 	filter: invert(1)
 }
