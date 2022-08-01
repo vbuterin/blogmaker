@@ -61,6 +61,8 @@ html, body {
 
 /*
 	Tables
+	- Optional: add 'transparent' class to create an invisible table, remove borders, striping and background, usually for tablegird layouts
+	- Optional: add 'centered' class to center align all the text within the table
 */
 #doc table thead tr, #doc table tr.header {
 	background-color: var(--color-table-row-header);
@@ -78,15 +80,37 @@ html, body {
 	border-color: var(--color-table-border);
 }
 
+#doc table.transparent,
+#doc table.transparent th,
+#doc table.transparent td,
+#doc table.transparent thead tr, #doc table.borderless tr.header,
+#doc table.transparent tbody tr, #doc table.borderless  tr.odd,
+#doc table.transparent tbody tr:nth-child(2n), #doc table.borderless tr.even {
+	border: none;
+	background-color: transparent;
+}
+
+#doc table.centered,
+#doc table.centered th,
+#doc table.centered td {
+	text-align: center;
+}
+
 /*
 	Images
+	- Optional: add 'transparent' class to remove the border and white background, useful to preserve transparent background images
 	- Optional: add 'padded' class to give extra padding to an image
 	- Optional: add 'invert' class to the image for dark mode inversion
-*/
+	*/
 #doc img {
 	box-sizing: border-box;
 	border: 1px solid var(--color-divider);
 	border-radius: 3px;
+}
+
+#doc img.transparent {
+	border: none;
+	background-color: transparent;
 }
 
 #doc img.padded {
