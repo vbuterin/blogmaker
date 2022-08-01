@@ -84,13 +84,13 @@ html, body {
 	- Optional: add 'invert' class to the image for dark mode inversion
 */
 #doc img {
+	box-sizing: border-box;
 	border: 1px solid var(--color-divider);
 	border-radius: 3px;
 }
 
 #doc img.padded {
 	padding: 12px;
-	background-color: #fff;
 }
 
 html.dark #doc img.invert {
