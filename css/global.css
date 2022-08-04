@@ -7,6 +7,8 @@
   --color-heading: #333;
   --color-anchor: #337ab7;
   --color-divider: #cdcdcd;
+  --color-code-bg: #f7f7f7;
+  --color-code-text: #333;
   --color-toggle-accent: #c3a554;
   --color-table-row-header: #e8e6e6;
   --color-table-row-odd: #fbfbfb;
@@ -23,6 +25,8 @@ html.dark {
   --color-heading: #dfdfdf;
   --color-anchor: #77e1cd;
   --color-divider: #8b8b8b;
+  --color-code-bg: #313030;
+  --color-code-text: #fefefe;
   --color-toggle-accent: #a076ce;
   --color-table-row-header: #000;
   --color-table-row-odd: #333333;
@@ -36,6 +40,16 @@ html.dark {
 html, body {
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+/*
+  Code blocks and formatted text
+*/
+.markdown-body code, .markdown-body code *,
+#doc pre, #doc code, #doc pre code,
+#doc pre *, #doc code *, #doc pre code * {
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
 }
 
 #doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
