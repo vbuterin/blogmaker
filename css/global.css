@@ -2,7 +2,7 @@
   Light Color Scheme
 */
 :root {
-  --color-bg: #fafafa;
+  --color-bg: #fff;
   --color-text: #333;
   --color-heading: #333;
   --color-anchor: #337ab7;
@@ -103,14 +103,14 @@ html, body {
   - Optional: add 'invert' class to the image for dark mode inversion
 */
 #doc img {
-  box-sizing: border-box;
-  border: 1px solid var(--color-divider);
+  border: none;
   border-radius: 3px;
+  box-sizing: border-box;
 }
 
 #doc img.transparent {
-  border: none;
   background-color: transparent;
+  border: none;
 }
 
 #doc img.padded {
