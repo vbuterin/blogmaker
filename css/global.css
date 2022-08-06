@@ -4,6 +4,7 @@
 :root {
   --color-anchor: #337ab7;
   --color-bg: #fff;
+  --color-blockquote-text: #777;
   --color-code-bg: #f7f7f7;
   --color-code-text: #333;
   --color-divider: #cdcdcd;
@@ -22,6 +23,7 @@
 html.dark {
   --color-anchor: #77e1cd;
   --color-bg: #1c1c1c;
+  --color-blockquote-text: #868686;
   --color-code-bg: #313030;
   --color-code-text: #fefefe;
   --color-divider: #8b8b8b;
@@ -62,8 +64,10 @@ html, body {
   background-color: var(--color-divider);
 }
 
-#doc blockquote {
+#doc blockquote, .markdown-body blockquote,
+#doc blockquote *, .markdown-body blockquote * {
   border-color: var(--color-divider);
+  color: var(--color-blockquote-text);
 }
 
 /*
