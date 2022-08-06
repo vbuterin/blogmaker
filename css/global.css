@@ -1,37 +1,37 @@
 /*
-  Light Color Scheme
+  Light Mode Color Scheme
 */
 :root {
-  --color-bg: #fff;
-  --color-text: #333;
-  --color-heading: #333;
   --color-anchor: #337ab7;
-  --color-divider: #cdcdcd;
+  --color-bg: #fff;
   --color-code-bg: #f7f7f7;
   --color-code-text: #333;
-  --color-toggle-accent: #c3a554;
+  --color-divider: #cdcdcd;
+  --color-heading: #333;
+  --color-table-border: #c2c2c2;
+  --color-table-row-even: #f0f0f0;
   --color-table-row-header: #e8e6e6;
   --color-table-row-odd: #fbfbfb;
-  --color-table-row-even: #f0f0f0;
-  --color-table-border: #c2c2c2;
+  --color-toggle-accent: #c3a554;
+  --color-text: #333;
 }
 
 /*
-  Dark Color Scheme
+  Dark Mode Color Scheme
 */
 html.dark {
-  --color-bg: #1c1c1c;
-  --color-text: #fafafa;
-  --color-heading: #dfdfdf;
   --color-anchor: #77e1cd;
-  --color-divider: #8b8b8b;
+  --color-bg: #1c1c1c;
   --color-code-bg: #313030;
   --color-code-text: #fefefe;
-  --color-toggle-accent: #a076ce;
+  --color-divider: #8b8b8b;
+  --color-heading: #dfdfdf;
+  --color-table-border: #767676;
+  --color-table-row-even: #181818;
   --color-table-row-header: #000;
   --color-table-row-odd: #333333;
-  --color-table-row-even: #181818;
-  --color-table-border: #767676;
+  --color-toggle-accent: #a076ce;
+  --color-text: #fafafa;
 }
 
 /*
@@ -43,15 +43,8 @@ html, body {
 }
 
 /*
-  Code blocks and formatted text
+  Typography & doc elements
 */
-.markdown-body code, .markdown-body code *,
-#doc pre, #doc code, #doc pre code,
-#doc pre *, #doc code *, #doc pre code * {
-  background-color: var(--color-code-bg);
-  color: var(--color-code-text);
-}
-
 #doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
   color: var(--color-heading);
   border-color: var(--color-divider);
@@ -74,8 +67,49 @@ html, body {
 }
 
 /*
+  Code blocks and formatted text
+*/
+.markdown-body code, .markdown-body code *,
+#doc pre, #doc code, #doc pre code,
+#doc pre *, #doc code *, #doc pre code * {
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
+}
+
+/*
+  Images
+  - Optional: add 'transparent' class to remove the border & background
+    - The image will inherit the light/dark mode background color
+    - Useful to preserve transparent background images/icons
+  - Optional: add 'padded' class to give extra padding to an image
+    - Very useful for graphs and charts
+  - Optional: add 'invert' class to the image for dark mode inversion
+    - Used to completely invert the colors of an image while in dark mode
+*/
+#doc img {
+  border: none;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+#doc img.transparent {
+  background-color: transparent;
+  border: none;
+}
+
+#doc img.padded {
+  padding: 12px;
+}
+
+html.dark #doc img.invert {
+  filter: invert(1)
+}
+
+/*
   Tables
-  - Optional: add 'transparent' class to create an invisible table, remove borders, striping and background, usually for tablegird layouts
+  - Normal tables are striped styled
+  - Optional: add 'transparent' class to create an invisible table, remove borders, striping and background
+    - Useful for when using tables for grid layouts
   - Optional: add 'centered' class to center align all the text within the table
 */
 #doc table thead tr, #doc table tr.header {
@@ -108,31 +142,6 @@ html, body {
 #doc table.centered th,
 #doc table.centered td {
   text-align: center;
-}
-
-/*
-  Images
-  - Optional: add 'transparent' class to remove the border & background, useful to preserve transparent background images/icons
-  - Optional: add 'padded' class to give extra padding to an image
-  - Optional: add 'invert' class to the image for dark mode inversion
-*/
-#doc img {
-  border: none;
-  border-radius: 3px;
-  box-sizing: border-box;
-}
-
-#doc img.transparent {
-  background-color: transparent;
-  border: none;
-}
-
-#doc img.padded {
-  padding: 12px;
-}
-
-html.dark #doc img.invert {
-  filter: invert(1)
 }
 
 /*
