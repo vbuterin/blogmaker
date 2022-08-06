@@ -63,7 +63,7 @@ html, body {
 }
 
 #doc blockquote {
-  border-left: var(--color-divider);
+  border-color: var(--color-divider);
 }
 
 /*
