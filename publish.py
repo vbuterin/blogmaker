@@ -29,6 +29,7 @@ HEADER_TEMPLATE = """
 <link rel="stylesheet" type="text/css" href="$root/css/fretboard.f32f2a8d5293869f0195.css">
 <link rel="stylesheet" type="text/css" href="$root/css/pretty.0ae3265014f89d9850bf.css">
 <link rel="stylesheet" type="text/css" href="$root/css/pretty-vendor.83ac49e057c3eac4fce3.css">
+<link rel="stylesheet" type="text/css" href="$root/css/global.css">
 <link rel="stylesheet" type="text/css" href="$root/css/misc.css">
 
 <script type="text/x-mathjax-config">
@@ -51,6 +52,53 @@ MathJax = {
 
 <div id="doc" class="container-fluid markdown-body comment-enabled" data-hard-breaks="true">
 
+<div id="color-mode-switch">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+  <input type="checkbox" id="switch" />
+  <label for="switch">Dark Mode Toggle</label>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+</div>
+"""
+
+TOGGLE_COLOR_SCHEME_JS = """
+<script type="text/javascript">
+  // Update root html class to set CSS colors
+  const toggleDarkMode = () => {
+    const root = document.querySelector('html');
+    root.classList.toggle('dark');
+  }
+
+  // Update local storage value for colorScheme
+  const toggleColorScheme = () => {
+    const colorScheme = localStorage.getItem('colorScheme');
+    if (colorScheme === 'light') localStorage.setItem('colorScheme', 'dark');
+    else localStorage.setItem('colorScheme', 'light');
+  }
+
+  // Set toggle input handler
+  const toggle = document.querySelector('#color-mode-switch input[type="checkbox"]');
+  if (toggle) toggle.onclick = () => {
+    toggleDarkMode();
+    toggleColorScheme();
+  }
+
+  // Check for color scheme on init
+  const checkColorScheme = () => {
+    const colorScheme = localStorage.getItem('colorScheme');
+    // Default to light for first view
+    if (colorScheme === null || colorScheme === undefined) localStorage.setItem('colorScheme', 'light');
+    // If previously saved to dark, toggle switch and update colors
+    if (colorScheme === 'dark') {
+      toggle.checked = true;
+      toggleDarkMode();
+    }
+  }
+  checkColorScheme();
+</script>
 """
 
 RSS_LINK = """
@@ -235,6 +283,7 @@ def make_toc(toc_items, global_config, all_categories, category=None):
         PRE_HEADER +
         RSS_LINK.format(root_path, title) +
         HEADER_TEMPLATE.replace('$root', root_path) +
+        TOGGLE_COLOR_SCHEME_JS +
         make_twitter_card(title, global_config) +
         TOC_TITLE_TEMPLATE.format(title) +
         make_categories_header(all_categories, root_path) +
@@ -257,7 +306,7 @@ if __name__ == '__main__':
     for file_location in sys.argv[1:]:
         filename = os.path.split(file_location)[1]
         print("Processing file: {}".format(filename))
-        
+
         # Extract path
         file_data = open(file_location).read()
         metadata = extract_metadata(open(file_location), filename)
@@ -265,13 +314,14 @@ if __name__ == '__main__':
 
         # Generate the html file
         options = metadata.get('pandoc', '')
-        
+
         os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
         root_path = '../../../..'
         total_file_contents = (
             PRE_HEADER +
             RSS_LINK.format(root_path, metadata['title']) +
             HEADER_TEMPLATE.replace('$root', root_path) +
+            TOGGLE_COLOR_SCHEME_JS +
             make_twitter_card(metadata['title'], global_config) +
             TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata), root_path) +
             defancify(open('/tmp/temp_output.html').read()) +
@@ -279,11 +329,11 @@ if __name__ == '__main__':
         )
 
         print("Path selected: {}".format(path))
-        
+
         # Make sure target directory exists
         truncated_path = os.path.split(path)[0]
         os.system('mkdir -p {}'.format(os.path.join('site', truncated_path)))
-        
+
         # Put it in the desired location
         out_location = os.path.join('site', path)
         open(out_location, 'w').write(total_file_contents)
@@ -295,7 +345,7 @@ if __name__ == '__main__':
         if filename[-4:-1] != '.sw':
             metadatas.append(extract_metadata(open(os.path.join('posts', filename)), filename))
             categories = categories.union(metadatas[-1]['categories'])
-            
+
     print("Detected categories: {}".format(' '.join(categories)))
 
     sorted_metadatas = sorted(metadatas, key=lambda x: x['date'], reverse=True)
