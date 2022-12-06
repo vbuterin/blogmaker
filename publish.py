@@ -345,6 +345,7 @@ if __name__ == '__main__':
         if filename[-4:-1] != '.sw':
             metadatas.append(extract_metadata(open(os.path.join('posts', filename)), filename))
             categories = categories.union(metadatas[-1]['categories'])
+    categories = sorted(categories)
 
     print("Detected categories: {}".format(' '.join(categories)))
 
