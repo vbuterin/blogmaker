@@ -5,6 +5,7 @@ PRE_HEADER = """
 
 <!DOCTYPE html>
 <html>
+<head>
 <meta charset="UTF-8">
 <style>
 @media (prefers-color-scheme: dark) {
@@ -44,6 +45,11 @@ MathJax = {
 
 <style>
 </style>
+"""
+
+HEAD_END_BODY_START = """
+</head>
+<body>
 
 <div id="doc" class="container-fluid markdown-body comment-enabled" data-hard-breaks="true">
 
@@ -102,6 +108,10 @@ RSS_LINK = """
 
 """
 
+TITLE_HEAD_TEMPLATE = """
+<title>{0}</title>
+"""
+
 TITLE_TEMPLATE = """
 
 <br>
@@ -109,19 +119,21 @@ TITLE_TEMPLATE = """
 <small style="float:left; color: #888"> {1} </small>
 <small style="float:right; color: #888"><a href="{2}/index.html">See all posts</a></small>
 <br> <br> <br>
-<title> {0} </title>
 
+"""
+
+TOC_TITLE_HEAD_TEMPLATE = """
+<title>{0}</title>
 """
 
 TOC_TITLE_TEMPLATE = """
 
-<title> {0} </title>
 <br>
 <center><h1 style="border-bottom:0px"> {0} </h1></center>
 
 """
 
-FOOTER = """ </div> """
+FOOTER = """ </div> </body> </html> """
 
 TOC_START = """
 
@@ -280,11 +292,14 @@ def make_toc(toc_items, global_config, all_categories, category=None):
         HEADER_TEMPLATE.replace('$root', root_path) +
         TOGGLE_COLOR_SCHEME_JS +
         make_twitter_card(title, global_config) +
+        TOC_TITLE_HEAD_TEMPLATE.format(title) +
+        HEAD_END_BODY_START +
         TOC_TITLE_TEMPLATE.format(title) +
         make_categories_header(all_categories, root_path) +
         TOC_START +
         ''.join(toc_items) +
-        TOC_END
+        TOC_END +
+        FOOTER
     )
 
 
@@ -318,6 +333,8 @@ if __name__ == '__main__':
             HEADER_TEMPLATE.replace('$root', root_path) +
             TOGGLE_COLOR_SCHEME_JS +
             make_twitter_card(metadata['title'], global_config) +
+            TITLE_HEAD_TEMPLATE.format(metadata['title']) +
+            HEAD_END_BODY_START +
             TITLE_TEMPLATE.format(metadata['title'], get_printed_date(metadata), root_path) +
             defancify(open('/tmp/temp_output.html').read()) +
             FOOTER
